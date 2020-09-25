@@ -19,7 +19,7 @@ def place(num):
     list = f.readlines()
     for line in list:
       row = row + 1
-      if '#' in line:
+      if '#' in line: 
         i = i + 1
         if line == target:
           list.insert(row, 'aaa\n')
