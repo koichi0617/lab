@@ -7,4 +7,6 @@ INST_COUNTER3_WE        0
 
 #2
 aaa
+aaa
+aaa
 

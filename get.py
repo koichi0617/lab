@@ -12,10 +12,10 @@
 
 
 def place(num):
+  target = '#%d\n' % num
+  row = 0
+  i = 0
   with open(file, mode='r') as f:
-    target = '#%d\n' % num
-    row = 0
-    i = 0
     list = f.readlines()
     for line in list:
       row = row + 1
@@ -27,7 +27,7 @@ def place(num):
             f.writelines(list)
             break
 
-      if line == list[-1]:
+      if line == list[-1] and num > i:
         list.insert(row+1, '#%d\n' % i)
         list.insert(row+2, '\n')
 
@@ -35,4 +35,4 @@ file = 'output.txt'
 state = 'aaa'
 value = 1
 
-place(2)
+place(5)
