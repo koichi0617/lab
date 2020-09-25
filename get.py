@@ -1,44 +1,38 @@
 #!/usr/bin/python
 # coding: UTF-8
-import sys
-
-file = 'output.txt'
-state = 'aaa'
-value = 1
 
 #命令を1行書き込む
-def push(state, value):
-  with open(file, mode='a') as f:
-    f.write(state)
-    for n in range(24-len(state)):
-      f.write(' ')
-    f.write(str(value))
-    f.write('\n')
+# def push(state, value):
+#   with open('aaa.txt', mode='w') as f:
+#     f.write(state)
+#     for n in range(24-len(state)):
+#       f.write(' ')
+#     f.write(str(value))
+#     f.write('\n')
 
 
 def place(num):
   with open(file, mode='r') as f:
-    text = f.read()
-    if ('#%d' % num) in text: #'#○'があったら、その下にpush
-      push(state, value)
-    else:
-      line = f.readline()
-      while line:
-        if '#' in line:
-          i = 0
-          i += 1
-          if i == num and line == ('#%d\n' % i):
-            with open(file, mode='a') as f:
-              f.write('\n')
-              push(state, value)
-              break
+    target = '#%d\n' % num
+    row = 0
+    i = 0
+    list = f.readlines()
+    for line in list:
+      row = row + 1
+      if '#' in line:
+        i = i + 1
+        if line == target:
+          list.insert(row, 'aaa\n')
+          with open(file, mode='w') as f:
+            f.writelines(list)
+            break
 
-        line = f.readline()
-        if line == '':
-          with open(file, mode='a') as f:
-            f.write('\n')
-            f.write('#%d\n' % i)
-          with open(file, mode='r') as f:
-            line = f.readline()
+      if line == list[-1]:
+        list.insert(row+1, '#%d\n' % i)
+        list.insert(row+2, '\n')
+
+file = 'output.txt'
+state = 'aaa'
+value = 1
 
 place(2)
