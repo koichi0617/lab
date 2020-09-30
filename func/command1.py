@@ -6,8 +6,6 @@ def command1(sharp_num):
 def sharp(num):
   state = 'INST_COUNTER0_WE'
   value = 32
-  push()
-  push()
   return 
 
 
