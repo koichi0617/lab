@@ -1,8 +1,11 @@
+# 予め定めた命令の組み合わせを出力
 def conv1(pattern):
+  # #0の記述を別ファイルからコピー
   with open('ini.mc', mode='r') as f:
     initial = f.read()
   with open(file, mode='w') as f:
     f.write(initial)
+  # 命令のまとまりを出力
   with open(file, mode='r') as f:
     list = f.readlines()
     all = len(list)
@@ -15,6 +18,7 @@ def conv1(pattern):
     list = f.readlines()
     all = len(list)
     x_back(all, pattern[6], pattern[7], pattern[8])
+  # #の番号を昇順にそろえる
   with open(file, mode='r') as f:
     list = f.readlines()
     i = 0
@@ -241,17 +245,19 @@ def push(state, value, width):
   return state + space + binary +'\n'
 
 
-#命令のまとまりを指定位置に挿入する関数
+# 命令のまとまりを指定位置に挿入する関数
 def set_command(num, command, pattern): #挿入位置（#num以降に挿入）、挿入する命令のまとまり
   target = '#%d\n' % num
   rows = 0
   i = 0
+  # 指定した#の行にたどり着いたら命令を出力
   with open(file, mode='r') as f:
     list = f.readlines()
     for line in list:
       rows = rows + 1
       if line == target:
         command(rows-3, pattern[0], pattern[1], pattern[2])
+  # #の番号を昇順にそろえる
   rows = 0
   with open(file, mode='r') as f:
     list = f.readlines()
