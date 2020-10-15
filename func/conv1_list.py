@@ -1,12 +1,26 @@
-# 指定した命令の組み合わせをまとめて出力する関数
-def conv1():
+#命令にパラメータを与える関数
+def give_params_3(command1, command2, command3):
+  command_1 = command1(1, 1, 1)
+  command_2 = command2(1, 1, 1)
+  command_3 = command3(1, 1, 1)
+  conv(command_1, command_2, command_3)
+
+def give_params_4(command1, command2, command3, command4):
+  command_1 = command1(1, 1, 1)
+  command_2 = command2(1, 1, 1)
+  command_3 = command3(1, 1, 1)
+  command_4 = command4(1, 1, 1)
+  #conv(command_1, command_2, command_3, command_4)
+
+#指定した命令の組み合わせをまとめて出力する関数
+def conv(command_1, command_2, command_3):
   # #0の記述を別ファイルからコピー
   with open('ini.mc', mode='r') as f:
     initial = f.read()
   with open(file, mode='w') as f:
     f.write(initial)
   # 命令のまとまりを出力
-  commands = cal_wbuf_pool(1,1,1) + wbuf_send(1,1,1) + conv_cal(1,1,1)
+  commands = command_1[0] + command_2[0] + command_3[0]
   with open(file, mode='a') as f:
     f.writelines(commands)
   # #の番号を昇順にそろえる
@@ -18,17 +32,29 @@ def conv1():
       if '#' in line: 
         list[rows] = '#%d\n' % i
         i += 1
+      # loop先の#を指定し直す
+      if 'INST_PC' in line and i > 1:
+        if i <= command_1[2]:
+          list[rows] = push('INST_PC', i - command_1[1] - 1, 32)
+        elif i > command_1[2] and i <= command_1[2] + command_2[2]:
+          list[rows] = push('INST_PC', i - command_2[1] - 1, 32)
+        elif i > command_1[2] + command_2[2]:
+          list[rows] = push('INST_PC', i - command_3[1] - 1, 32)
       rows += 1
   with open(file, mode='w') as f:
     f.writelines(list)
 
-def x_send(addr, loop, row): #(SRAM開始アドレス、ループ回数、挿入開始列)
+#命令のまとまり
+def wbuf_send(addr, loop, row): #(SRAM開始アドレス、ループ回数、挿入開始列)
+  sharp_num = 7
+  loop_num = 2 #loop先が何個前の#か判定
   list = []
   list.append('//send\n')
   list.append('#1\n')
   list.append(push('INST_RADDRX', addr, 16))
   list.append(push('INST_RCEBX', 0, 1))
   list.append('\n')
+  list.append('//loop to here\n')
   list.append('#2\n')
   list.append(push('INST_WBUF_EN', 1, 1))
   list.append(push('INST_WBUF_EN_CTRL', row, 6))
@@ -54,77 +80,54 @@ def x_send(addr, loop, row): #(SRAM開始アドレス、ループ回数、挿入
   list.append('#7\n')
   list.append(push('INST_RADDRX', 0, 16))
   list.append('\n')
-  return list
+  return list, loop_num, sharp_num
 
-def x_calc(addr, loop, row): #(SRAM開始アドレス、ループ回数、挿入開始列)
+def output_send(addr, loop, row): #(SRAM開始アドレス、ループ回数、挿入開始列)
+  sharp_num = 7
+  loop_num = 2
   list = []
-  list.append('//calc\n')
+  list.append('//output\n')
   list.append('#1\n')
-  list.append(push('INST_RADDRX', addr, 16))
-  list.append(push('INST_RCEBX', 0, 1))
+  list.append(push('INST_WADDRX', addr, 16))
+  list.append(push('INST_WADDRX_WE', 1, 1))
   list.append('\n')
+  list.append('//output_send start loop to here\n')
   list.append('#2\n')
-  list.append(push('INST_WBUF_EN', 1, 1))
-  list.append(push('INST_WBUF_EN_CTRL', row, 6))
+  list.append(push('INST_OUTPUT_EN', 1, 1))
+  list.append(push('INST_OUTPUT_EN_CTRL', row, 6))
+  list.append(push('INST_RESULT_PURGE', 0, 1))
+  list.append(push('INST_WCEBX', 0, 1))
+  list.append(push('INST_WADDRX', 1, 16))
+  list.append(push('INST_WADDRX_WE', 0, 1))
   list.append('\n')
   list.append('#3\n')
-  list.append(push('INST_COUNTER0_WE', 1, 1))
-  list.append(push('INST_COUNTER0', loop, 16))
+  list.append(push('INST_WBUF_EN_CTRL', 0, 6))
+  list.append(push('INST_COUNTER0_WE', 0, 1))
+  list.append(push('INST_COUNTER0', loop, 32))
   list.append('\n')
   list.append('#4\n')
+  list.append(push('INST_WBUF_EN_CTRL', 0, 6))
   list.append(push('INST_COUNTER0_WE', 0, 1))
   list.append(push('INST_JUMP_COUNTER0', 1, 1))
   list.append(push('INST_PC', 2, 32))
   list.append('\n')
   list.append('#5\n')
+  list.append(push('INST_OUTPUT_EN', 1, 1))
   list.append(push('INST_JUMP_COUNTER0', 0, 1))
-  list.append(push('INST_WBUF_EN_CTRL', 1, 6))
+  list.append(push('INST_OUTPUT_EN_CTRL', 1, 6))
   list.append('\n')
   list.append('#6\n')
-  list.append(push('INST_WBUF_EN', 0, 1))
   list.append(push('INST_WBUF_EN_CTRL', 0, 6))
-  list.append(push('INST_RADDRX', -1, 16))
+  list.append('//output_send end\n')
   list.append('\n')
   list.append('#7\n')
-  list.append(push('INST_RADDRX', 0, 16))
+  list.append(push('INST_WBUF_EN_CTRL', 1, 1))
   list.append('\n')
-  return list
-
-def x_back(addr, loop, row): #(SRAM開始アドレス、ループ回数、挿入開始列)
-  list = []
-  list.append('//back\n')
-  list.append('#1\n')
-  list.append(push('INST_RADDRX', addr, 16))
-  list.append(push('INST_RCEBX', 0, 1))
-  list.append('\n')
-  list.append('#2\n')
-  list.append(push('INST_WBUF_EN', 1, 1))
-  list.append(push('INST_WBUF_EN_CTRL', row, 6))
-  list.append('\n')
-  list.append('#3\n')
-  list.append(push('INST_COUNTER0_WE', 1, 1))
-  list.append(push('INST_COUNTER0', loop, 16))
-  list.append('\n')
-  list.append('#4\n')
-  list.append(push('INST_COUNTER0_WE', 0, 1))
-  list.append(push('INST_JUMP_COUNTER0', 1, 1))
-  list.append(push('INST_PC', 2, 32))
-  list.append('\n')
-  list.append('#5\n')
-  list.append(push('INST_JUMP_COUNTER0', 0, 1))
-  list.append(push('INST_WBUF_EN_CTRL', 1, 6))
-  list.append('\n')
-  list.append('#6\n')
-  list.append(push('INST_WBUF_EN', 0, 1))
-  list.append(push('INST_WBUF_EN_CTRL', 0, 6))
-  list.append(push('INST_RADDRX', -1, 16))
-  list.append('\n')
-  list.append('#7\n')
-  list.append(push('INST_RADDRX', 0, 16))
-  list.append('\n')
-  return list
+  return list, loop_num, sharp_num
 
 def cal_wbuf_pool(addr, loop, row): #(SRAM開始アドレス、ループ回数、挿入開始列)
+  sharp_num = 27
+  loop_num = 8
   list = []
   list.append('//cal + wbuf_pool')
   list.append('#1\n')
@@ -214,7 +217,7 @@ def cal_wbuf_pool(addr, loop, row): #(SRAM開始アドレス、ループ回数�
   list.append('#15\n')
   list.append(push('INST_COUNTER0_WE', 0, 1))
   list.append(push('INST_JUMP_COUNTER0', 1, 1))
-  list.append(push('INST_PC', 7, 32))
+  list.append(push('INST_PC', 2, 32))
   list.append(push('INST_RADDRX', 125, 16))
   list.append(push('INST_RADDRW', 1, 16))
   list.append('\n')
@@ -267,9 +270,11 @@ def cal_wbuf_pool(addr, loop, row): #(SRAM開始アドレス、ループ回数�
   list.append('#\n')    
   list.append(push('INST_UNUSED', 0, 1))
   list.append('\n')
-  return list
+  return list, loop_num, sharp_num
 
 def cal_wbuf_out(addr, loop, row): #(SRAM開始アドレス、ループ回数、挿入開始列)
+  sharp_num = 17
+  loop_num = 3
   list = []
   list.append('//cal+wbuf+out\n')
   list.append('#1\n')
@@ -368,9 +373,11 @@ def cal_wbuf_out(addr, loop, row): #(SRAM開始アドレス、ループ回数、
   list.append('#\n')
   list.append(push('INST_UNUSED', 0, 0))
   list.append('\n')
-  return list
+  return list, loop_num, sharp_num
 
 def conv_cal(addr, loop, row): #(SRAM開始アドレス、ループ回数、挿入開始列)
+  sharp_num = 17
+  loop_num = 3
   list = []
   list.append('//conv_cal\n')
   list.append('#1\n')
@@ -439,9 +446,11 @@ def conv_cal(addr, loop, row): #(SRAM開始アドレス、ループ回数、挿�
   list.append('#\n')
   list.append(push('INST_UNUSED', 0, 0))
   list.append('\n')
-  return list
+  return list, loop_num, sharp_num
 
 def conv_cal_wbuf(addr, loop, row): #(SRAM開始アドレス、ループ回数、挿入開始列)
+  sharp_num = 17
+  loop_num = 3
   list = []
   list.append('//conv_cal+wbuf start\n')
   list.append('#1\n')
@@ -530,49 +539,11 @@ def conv_cal_wbuf(addr, loop, row): #(SRAM開始アドレス、ループ回数�
   list.append('#\n')
   list.append(push('INST_UNUSED', 0, 0))
   list.append('\n')
-  return list
-
-def output_send(addr, loop, row): #(SRAM開始アドレス、ループ回数、挿入開始列)
-  list = []
-  list.append('#1\n')
-  list.append(push('INST_WADDRX', 0, 16))
-  list.append(push('INST_WADDRX_WE', 1, 1))
-  list.append('\n')
-  list.append('//output_send start loop to here\n')
-  list.append('#2\n')
-  list.append(push('INST_OUTPUT_EN', 1, 1))
-  list.append(push('INST_OUTPUT_EN_CTRL', 0, 6))
-  list.append(push('INST_RESULT_PURGE', 0, 1))
-  list.append(push('INST_WCEBX', 0, 1))
-  list.append(push('INST_WADDRX', 1, 16))
-  list.append(push('INST_WADDRX_WE', 0, 1))
-  list.append('\n')
-  list.append('#3\n')
-  list.append(push('INST_WBUF_EN_CTRL', 0, 6))
-  list.append(push('INST_COUNTER0_WE', 0, 1))
-  list.append(push('INST_COUNTER0', 64, 32))
-  list.append('\n')
-  list.append('#4\n')
-  list.append(push('INST_WBUF_EN_CTRL', 0, 6))
-  list.append(push('INST_COUNTER0_WE', 0, 1))
-  list.append(push('INST_JUMP_COUNTER0', 1, 1))
-  list.append(push('INST_PC', 2, 32))
-  list.append('\n')
-  list.append('#5\n')
-  list.append(push('INST_OUTPUT_EN', 1, 1))
-  list.append(push('INST_JUMP_COUNTER0', 0, 1))
-  list.append(push('INST_OUTPUT_EN_CTRL', 1, 6))
-  list.append('\n')
-  list.append('#6\n')
-  list.append(push('INST_WBUF_EN_CTRL', 0, 6))
-  list.append('//output_send end')
-  list.append('\n')
-  list.append('#7\n')
-  list.append(push('INST_WBUF_EN_CTRL', 1, 1))
-  list.append('\n')
-  return list
+  return list, loop_num, sharp_num
 
 def output_send_pool(addr, loop, row): #(SRAM開始アドレス、ループ回数、挿入開始列)
+  sharp_num = 32
+  loop_num = 8
   list = []
   list.append('#1\n')
   list.append(push('INST_WADDRX', 0, 16))
@@ -700,49 +671,11 @@ def output_send_pool(addr, loop, row): #(SRAM開始アドレス、ループ回�
   list.append('#\n')
   list.append(push('INST_UNUSED', 0, 0))
   list.append('\n')
-  return list
-
-def wbuf_send(addr, loop, row): #(SRAM開始アドレス、ループ回数、挿入開始列)
-  list = []
-  list.append('//wbuf_send start\n')
-  list.append('#1\n')
-  list.append(push('INST_RADDRX', 1, 16))
-  list.append(push('INST_RCEBX', 0, 1))
-  list.append(push('INST_WBUF_PURGE', 1, 1))
-  list.append('\n')
-  list.append('//loop to here\n')
-  list.append('#2\n')
-  list.append(push('INST_WBUF_PURGE', 0, 1))
-  list.append(push('INST_WBUF_EN', 1, 1))
-  list.append(push('INST_WBUF_EN_CTRL', 0, 6))
-  list.append('\n')
-  list.append('#3\n')
-  list.append(push('INST_WBUF_EN_CTRL', 0, 6))
-  list.append(push('INST_COUNTER0_WE', 1, 1))
-  list.append(push('INST_COUNTER0', 32, 16))
-  list.append('\n')
-  list.append('#4\n')
-  list.append(push('INST_WBUF_EN_CTRL', 0, 6))
-  list.append(push('INST_COUNTER0_WE', 0, 1))
-  list.append(push('INST_JUMP_COUNTER0', 1, 1))
-  list.append(push('INST_PC', 2, 32))
-  list.append('\n')
-  list.append('#5\n')
-  list.append(push('INST_JUMP_COUNTER0', 0, 1))
-  list.append(push('INST_WBUF_EN_CTRL', 1, 6))
-  list.append('\n')
-  list.append('#6\n')
-  list.append(push('INST_WBUF_EN', 0, 1))
-  list.append(push('INST_WBUF_EN_CTRL', 0, 6))
-  list.append(push('INST_RADDRX', 1, 16))
-  list.append('\n')
-  list.append('#7\n')
-  list.append(push('INST_RADDRX', 0, 16))
-  list.append('//wbu_send end\n')
-  list.append('\n')
-  return list
+  return list, loop_num, sharp_num
 
 def wbuf_send_pool(addr, loop, row): #(SRAM開始アドレス、ループ回数、挿入開始列)
+  sharp_num = 27
+  loop_num = 8
   list = []
   list.append('//adrs = row0_depth = row1_depth\n')
   list.append('#1\n')
@@ -772,6 +705,7 @@ def wbuf_send_pool(addr, loop, row): #(SRAM開始アドレス、ループ回数�
   list.append(push('INST_WBUF_EN_CTRL', 0, 6))
   list.append(push('INST_RADDRX', 1, 16))
   list.append('\n')
+  list.append('//loop to here\n')
   list.append('#7\n')
   list.append(push('INST_WBUF_EN', 0, 1))
   list.append(push('INST_I_COMPARE_SWITCH', 1, 1))
@@ -864,9 +798,9 @@ def wbuf_send_pool(addr, loop, row): #(SRAM開始アドレス、ループ回数�
   list.append('#\n')
   list.append(push('INST_UNUSED', 0, 0))
   list.append('\n')
-  return list
+  return list, loop_num, sharp_num
 
-
+#命令1行を出力
 def push(state, value, width):
   space = ''
   zero  = ''
@@ -882,9 +816,8 @@ def push(state, value, width):
     space = space + ' '
   return state + space + binary +'\n'
 
-
-# 命令のまとまりを指定位置に挿入する関数
-def set_command(num, command): #挿入位置（#num以降に挿入）、挿入する命令のまとまり
+#命令のまとまりを指定位置に挿入する関数
+def insert_command(num, command): #挿入位置（#num以降に挿入）、挿入する命令のまとまり
   target = '#%d\n' % num
   rows = 0
   i = 0
@@ -909,8 +842,6 @@ def set_command(num, command): #挿入位置（#num以降に挿入）、挿入�
     f.writelines(list_com)
 
 
-A = [1, 32, 1, 1, 32, 1, 1, 32, 1]
-B = [16, 16, 1, 16, 16, 1, 16, 16, 1]
 file = 'output.txt'
-conv1()
-set_command(50, x_back)
+give_params_3(wbuf_send, output_send, cal_wbuf_out)
+# insert_command(50, x_back)

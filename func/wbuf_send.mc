@@ -7,12 +7,12 @@ INST_JUMP_COUNTER0      0
 INST_JUMP_COUNTER1      0
 INST_JUMP_COUNTER2      0
 INST_JUMP_COUNTER3      0
-INST_RADDRX_WE          0
+INST_RADDRX_WE          0 # SRAM 0:加算 1:上書き
 INST_WADDRX_WE          0
 INST_RADDRW_WE          0
 INST_RADDRX_BAK         0
 INST_RADDRW_BAK         0
-INST_WBUF_EN_CTRL_WE    0
+INST_WBUF_EN_CTRL_WE    0 # PB列について
 INST_OUTPUT_EN_CTRL_WE  0
 INST_UNUSED             0
 INST_PC                 00000000000000000000000000000000
@@ -61,7 +61,7 @@ INST_SEQ_FIN            0
 INST_SEQ_STARTW         0
 INST_SEQ_STARTX         0
 INST_SEQ_STARTX_OUT     0
-INST_RCEBX0             0
+INST_RCEBX0             1
 INST_I_COMPARE_REGEN    0
 
 //wbuf_send start
@@ -94,4 +94,4 @@ INST_RADDRX             1000000000000001 #SRAMのアドレスをひとつ戻す
 
 #7
 INST_RADDRX             0000000000000000
-//wbu_send end
+//wbuf_send end

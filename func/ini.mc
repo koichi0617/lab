@@ -61,6 +61,6 @@ INST_SEQ_FIN            0
 INST_SEQ_STARTW         0
 INST_SEQ_STARTX         0
 INST_SEQ_STARTX_OUT     0
-INST_RCEBX0             0
+INST_RCEBX0             1
 INST_I_COMPARE_REGEN    0
 
