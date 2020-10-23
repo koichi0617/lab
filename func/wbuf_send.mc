@@ -66,7 +66,7 @@ INST_I_COMPARE_REGEN    0
 
 //wbuf_send start
 #1 データ取り出し
-INST_RADDRX             0000000000000001 #取り出し場所指定 1ずつSRAMのアドレスを移動
+INST_RADDRX             0000000000000001 #取り出し場所指定 1ずつSRAMのアドレスを移動(_WEが０のため加算)
 INST_RCEBX              0                #データを取り出す処理
 
 //loop_to_here

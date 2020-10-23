@@ -110,3 +110,6 @@
 `define INST_WAIT_MBUSYW 215
 `define INST_WAIT_MBUSYXI 216
 `define INST_WAIT_MBUSYXO 217
+
+//Reduction
+`define 

@@ -72,13 +72,13 @@ module SEQUENCER (input wire CLK,
                   output wire SEQ_STARTX_OUT,
                   output wire RCEBX0);
     
-    reg [31:0] pc;
-    reg [15:0] counter0;
-    reg [15:0] counter1;
-    reg [15:0] counter2;
-    reg [15:0] counter3;
-    reg [15:0] reg_raddrx;
-    reg [15:0] reg_waddrx;
+    reg [31:0] pc; //SRAM（マイクロコード）の何行目からもってくるか
+    reg [15:0] counter0; //ループ回数
+    reg [15:0] counter1; //ループ回数
+    reg [15:0] counter2; //ループ回数
+    reg [15:0] counter3; //ループ回数
+    reg [15:0] reg_raddrx; //SRAMからの読み取りアドレス
+    reg [15:0] reg_waddrx; //SRAMアドレス
     reg [15:0] reg_raddrw;
     reg [15:0] reg_raddrx_bak;
     reg [15:0] reg_raddrw_bak;
@@ -93,7 +93,7 @@ module SEQUENCER (input wire CLK,
     reg        reg_switch_latch;
     reg [255:0] qi_latch;
     
-    assign RADDRI = {pc[14:0],1'b0};
+    assign RADDRI = {pc[14:0],1'b0}; //SRAMの何行目かを指定
     assign RCEBI  = 1'b0;
     assign RADDRX         = reg_raddrx_latch;
     assign WADDRX         = reg_waddrx_latch;
@@ -440,7 +440,7 @@ module SEQUENCER (input wire CLK,
         end
     end
 
-    //Assign QI to CTRL pins
+    //Assign QI to CTRL pins : SRAMの値をwire変数に格納
     assign BANKX            = qi_latch[`INST_BANKX];
     assign WCEBX            = qi_latch[`INST_WCEBX];
     assign RCEBX            = qi_latch[`INST_RCEBX];
