@@ -89,9 +89,9 @@ INST_WBUF_EN_CTRL       000001  #次の列に移動
 
 #6 データ受け入れ中止
 INST_WBUF_EN            0  #受け入れをやめる
-INST_WBUF_EN_CTRL       000000 #列移動しない
+INST_WBUF_EN_CTRL       000000 #PB列を固定（加算しない）
 INST_RADDRX             1000000000000001 #SRAMのアドレスをひとつ戻す
 
 #7
-INST_RADDRX             0000000000000000
+INST_RADDRX             0000000000000000 #アドレスを固定（加算しない）
 //wbuf_send end

@@ -246,7 +246,7 @@ module SEQUENCER (input wire CLK,
                                 reg_raddrx <= reg_raddrx + QI[`INST_RADDRX_E - 1:`INST_RADDRX_S];
                             1'b1:
                                 reg_raddrx <= reg_raddrx - QI[`INST_RADDRX_E - 1:`INST_RADDRX_S];
-                            endcase
+                        endcase
                 1'b1:
                     reg_raddrx <= QI[`INST_RADDRX_E:`INST_RADDRX_S];
             endcase
