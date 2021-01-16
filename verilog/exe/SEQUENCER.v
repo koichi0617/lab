@@ -480,14 +480,4 @@ module SEQUENCER (input wire CLK,
     assign RCEBX0           = qi_latch[`INST_RCEBX0];
 
 
-    //命令モジュール呼び出し
-    wbuf_send wbuf_send_0(
-        .CLK(CLK), //.下位ピン名(上位信号名)
-        .RSTL(RSTL),
-        .RADDRX(reg_raddrx),
-        .RCEBX(RCEBX),
-        .WBUF_EN(WBUF_EN),
-        .WBUF_EN_CTRL(WBUF_EN_CTRL)
-    )
-
 endmodule

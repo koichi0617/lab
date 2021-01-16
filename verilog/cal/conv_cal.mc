@@ -38,7 +38,7 @@ INST_SWITCH             0
 INST_FC_WEIGHT_EN       0
 INST_NL_EN              0
 INST_SHIFT_MODE         1
-INST_NL_SEL             11
+INST_NL_SEL             11 //PBの値をずらす方向を定義(下から上に)
 INST_MAC_EN             0
 INST_RESULT_REQ         0
 INST_OLSB               0100
@@ -64,38 +64,68 @@ INST_SEQ_STARTX_OUT     0
 INST_RCEBX0             0
 INST_I_COMPARE_REGEN    0
 
-//wbuf_send start
 #1
-INST_RADDRX             0000000000000001
-INST_RCEBX              0
-INST_WBUF_PURGE         1
+INST_RADDRW             0000000000000001 //SRAMの重みを読み込み
+INST_RCEBW              0 //重み読み込み
 
 //loop_to_here
 #2
-INST_WBUF_PURGE         0
-INST_WBUF_EN            1
-INST_WBUF_EN_CTRL       000000
+INST_RADDRW             0000000000000001
+INST_NL_EN              1 //PBの値をずらす(4サイクル後にずれる)
+INST_MAC_EN             1 //MAC演算を行う(畳み込む)
 
 #3
-INST_WBUF_EN_CTRL       000000
-INST_COUNTER0_WE        1
-INST_COUNTER0           0000000000100000
+INST_MAC_EN             0
+INST_RADDRW             0000000000000001
 
 #4
-INST_WBUF_EN_CTRL       000000
+INST_RADDRW             0000000000000000
+INST_COUNTER0_WE        1
+INST_COUNTER0           0000000001000000 //ループ回数きめる
+
+#5
+INST_RADDRW             0000000000000001
 INST_COUNTER0_WE        0
 INST_JUMP_COUNTER0      1
 INST_PC                 00000000000000000000000000000010
 
-#5
-INST_JUMP_COUNTER0      0
-INST_WBUF_EN_CTRL       000001
-
 #6
-INST_WBUF_EN            0
-INST_WBUF_EN_CTRL       000000
-INST_RADDRX             1000000000000001
+INST_NL_EN              0 //PBの値をずらすのをやめる
+INST_JUMP_COUNTER0      0
+INST_RADDRW             0000000000000001
+//conv_cal_loop end
 
 #7
-INST_RADDRX             0000000000000000
-//wbuf_send end
+INST_RCEBW              1
+INST_RADDRW             1000000000000001
+INST_NL_EN              0
+
+#8
+INST_RADDRW             0000000000000000
+
+#
+INST_UNUSED             0
+
+#
+INST_UNUSED             0
+
+#
+INST_UNUSED             0
+
+#
+INST_UNUSED             0
+
+#
+INST_UNUSED             0
+
+#
+INST_UNUSED             0
+
+#
+INST_UNUSED             0
+
+#
+INST_UNUSED             0
+
+#
+INST_UNUSED             0

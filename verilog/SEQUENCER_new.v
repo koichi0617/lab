@@ -95,11 +95,6 @@ module SEQUENCER (input wire CLK,
     
     assign RADDRI = {pc[14:0],1'b0}; //SRAMの何行目かを指定
     assign RCEBI  = 1'b0;
-    assign RADDRX         = reg_raddrx_latch;
-    assign WADDRX         = reg_waddrx_latch;
-    assign RADDRW         = reg_raddrw_latch;
-    assign WBUF_EN_CTRL   = reg_wbufenctrl_latch;
-    assign OUTPUT_EN_CTRL = reg_outputenctrl_latch;
     assign WBUF_SWITCH    = reg_switch_latch;
     
     //PC
@@ -480,14 +475,19 @@ module SEQUENCER (input wire CLK,
     assign RCEBX0           = qi_latch[`INST_RCEBX0];
 
 
-    //命令モジュール呼び出し
+    //命令モジュール呼び出し //.下位input(上位input) or .下位output(上位output)
     wbuf_send wbuf_send_0(
-        .CLK(CLK), //.下位ピン名(上位信号名)
+        //input
+        .CLK(CLK),
         .RSTL(RSTL),
-        .RADDRX(reg_raddrx),
+        .COUNTER0(QI[`INST_COUNTER0_E:`INST_COUNTER0_S]),
+        .raddrx(QI[`INST_RADDRX_E:`INST_RADDRX_S]),
+        .wbuf_en_ctrl(QI[`INST_WBUF_EN_CTRL_E:`INST_WBUF_EN_CTRL_S]),
+        //output
+        .RADDRX(RADDRX),
         .RCEBX(RCEBX),
         .WBUF_EN(WBUF_EN),
         .WBUF_EN_CTRL(WBUF_EN_CTRL)
-    )
+    );
 
 endmodule

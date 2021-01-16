@@ -64,38 +64,38 @@ INST_SEQ_STARTX_OUT     0
 INST_RCEBX0             0
 INST_I_COMPARE_REGEN    0
 
-//wbuf_send start
 #1
-INST_RADDRX             0000000000000001
-INST_RCEBX              0
-INST_WBUF_PURGE         1
+INST_WADDRX             0000000000000000  #書き込むSRAMアドレスを指定
+INST_WADDRX_WE          1 #SRAMのアドレスを上書き
 
-//loop_to_here
+//output_send start loop to here
 #2
-INST_WBUF_PURGE         0
-INST_WBUF_EN            1
-INST_WBUF_EN_CTRL       000000
+INST_OUTPUT_EN          1 #SRAMからPBが受け取る
+INST_OUTPUT_EN_CTRL     000000  #PBの取り出す列を指定
+INST_RESULT_PURGE       0 
+INST_WCEBX              0 #SRAMにデータを書き込む処理
+INST_WADDRX             0000000000000001  #書き込むSRAMアドレスを指定  1ずつ加算することでSRAMのアドレスを移動
+INST_WADDRX_WE          0 #SRAMのアドレスを加算
 
-#3
-INST_WBUF_EN_CTRL       000000
+#3 ループ回数指定
+INST_WBUF_EN_CTRL       000000 #列指定してそこだけで処理
 INST_COUNTER0_WE        1
-INST_COUNTER0           0000000000100000
+INST_COUNTER0           00000000000000000000000001000000
 
-#4
+#4 ループのジャンプ先指定
 INST_WBUF_EN_CTRL       000000
 INST_COUNTER0_WE        0
 INST_JUMP_COUNTER0      1
-INST_PC                 00000000000000000000000000000010
+INST_PC                 00000000000000000000000000000010  # ループ先に#2を指定
 
 #5
-INST_JUMP_COUNTER0      0
-INST_WBUF_EN_CTRL       000001
+INST_OUTPUT_EN          1
+INST_JUMP_COUNTER0      0 #ジャンプ
+INST_OUTPUT_EN_CTRL     000001  #次の列に移動
 
 #6
-INST_WBUF_EN            0
 INST_WBUF_EN_CTRL       000000
-INST_RADDRX             1000000000000001
+//output_send end
 
 #7
-INST_RADDRX             0000000000000000
-//wbuf_send end
+INST_WBUF_EN_CTRL       000000
