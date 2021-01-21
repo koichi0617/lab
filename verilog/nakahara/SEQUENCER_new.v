@@ -56,7 +56,7 @@ module SEQUENCER (input wire CLK,
     reg [7:0] counter1; //ループ回数
     reg [7:0] counter2; //ループ回数
     reg [7:0] counter3; //ループ回数
-    wire [15:0] reg_raddrx; //SRAMからの読み取りアドレス
+    reg [15:0] reg_raddrx; //SRAMからの読み取りアドレス
     reg [15:0] reg_waddrx; //SRAMアドレス
     reg [15:0] reg_raddrw;
     reg [15:0] reg_raddrx_bak;
@@ -74,126 +74,57 @@ module SEQUENCER (input wire CLK,
     wire [7:0] counter_end;
     reg [2:0] cnt;
     reg [7:0] counter;
-    reg       reg_rcebi;
     wire [15:0] counter_en;
-    
+    wire module_busy;
+    wire wbuf_busy;
+    wire module_en;
+    reg  pc_adjust;
+
     assign RADDRI = {pc[14:0],1'b0};
     assign RCEBI  = 1'b0;
     assign counter_en = QI[`INST_COUNTER0_E:`INST_COUNTER0_S];
-
-    //RCEBI
-    // always@ (posedge CLK or negedge RSTL or posedge QI[`INST_WBUF_SEND] or negedge QI[`INST_WBUF_SEND])
-    // begin
-    //     if (!RSTL)       reg_rcebi <= 1'b1;
-    //     else if (PURGE)  reg_rcebi <= 1'b1;
-    //     else if(counter_en) begin
-    //         if(cnt == 3'b001 && counter == QI[`INST_COUNTER0_E:`INST_COUNTER0_S])
-    //             reg_rcebi <= 1'b1;
-    //         else
-    //             reg_rcebi <= 1'b0;
-    //     end
-    // end
-
-
-    wire busy = (counter != 0);
-    reg pre_busy;
-    always@ (posedge CLK or negedge RSTL)
-    begin
-        if (!RSTL | PURGE) pre_busy <= 1'b1;
-        else pre_busy <= busy;
-    end
-    wire decode = ~pre_busy;
+    assign module_busy = wbuf_busy;
+    assign module_en = QI[`INST_WBUF_SEND];
 
     //PC
     always@ (posedge CLK or negedge RSTL)
     begin
-        if (!RSTL)       pc <= 16'b0;
-        else if (PURGE)  pc <= 16'b0;
-        else if (busy | decode)
-            pc <= pc;
-        else 
-            pc <= pc + 1;
+        if (!RSTL)                          pc <= 16'b0;
+        else if (PURGE)                     pc <= 16'b0;
+        else if (module_busy)               pc <= pc;
+        else if (!pc_adjust & module_en)    pc <= pc;
+        else                                pc <= pc + 1'b1;
     end
-
-
-
     
-    //PC
-    // always@ (posedge CLK or negedge RSTL)
-    // begin
-    //     if (!RSTL)       pc <= 16'b0;
-    //     else if (PURGE)  pc <= 16'b0;
-    //     else if (counter_en) begin
-    //         if(counter != 0)
-    //             pc <= pc;
-    //         else
-    //             pc <= pc + 1;
-    //     end
-    //     else 
-    //         pc <= pc + 1;
-        // else begin //ループ処理
-        //     case({QI[`INST_JUMP_COUNTER3],QI[`INST_JUMP_COUNTER2],QI[`INST_JUMP_COUNTER1]})
-        //         4'b001:
-        //             if (counter1 == 16'b1)
-        //                 pc <= pc + 1'b1;
-        //             else
-        //                 pc <= QI[`INST_PC_E:`INST_PC_S];
-        //         4'b010:
-        //             if (counter2 == 16'b1)
-        //                 pc <= pc + 1'b1;
-        //             else
-        //                 pc <= QI[`INST_PC_E:`INST_PC_S];
-        //         4'b100:
-        //             if (counter3 == 16'b1)
-        //                 pc <= pc + 1'b1;
-        //             else
-        //                 pc <= QI[`INST_PC_E:`INST_PC_S];
-        //         default:
-        //             pc <= pc + 1'b1;
-        //     endcase
-        // end
-    // end
-
-    //counter
-  	always @(posedge CLK or negedge RSTL)  begin
-		if (!RSTL)
-			counter <= 1'd0;
-		else if(QI[`INST_WBUF_SEND]) begin
-			if(counter == 1'd0)
-				counter <= QI[`INST_COUNTER0_E:`INST_COUNTER0_S];
-		end else if(cnt == 3'b100)
-			counter <= counter - 1;
-		else
-			counter <= counter;
-	end
-
-    //cnt:モジュール用カウンタ(wbuf & output)
+    //pc_adjust
     always@ (posedge CLK or negedge RSTL)
     begin
-        if(!RSTL)       cnt <= 0;
-        else if(PURGE)  cnt <= 0; 
-        else if(counter_en) begin
-			if(cnt == 3'b100) begin
-				if(counter == 16'd1)
-					cnt <= 3'b000;
-				else
-					cnt <= 3'b001;
-			end else
-        		cnt <= cnt + 1;
-		end else
-			cnt <= 3'b000;
+        if (!RSTL)      pc_adjust <= 0;
+        else if (PURGE) pc_adjust <= 0;
+        else            pc_adjust <= module_busy;
     end
 
-    //reg_raddrx_bak
-    always @(posedge CLK or negedge RSTL)  begin
-		if (!RSTL)
-			reg_raddrx_bak <= 1'd0;
-		else if(RADDRX)
-            reg_raddrx_bak <= RADDRX;
-		else
-			reg_raddrx_bak <= 1'd0;
-	end
-
+    //RADDRX
+    wire [15:0] raddrx;
+    assign raddrx = reg_raddrx;
+    always@ (posedge CLK or negedge RSTL)
+    begin
+        if (!RSTL)       reg_raddrx <= 16'b0;
+        else if (PURGE)  reg_raddrx <= 16'b0;
+        else begin
+            case(QI[`INST_RADDRX_WE])
+                1'b0:
+                    case(QI[`INST_RADDRX_E])
+                        1'b0:
+                            reg_raddrx <= reg_raddrx + QI[`INST_RADDRX_E - 1:`INST_RADDRX_S];
+                        1'b1:
+                            reg_raddrx <= reg_raddrx - QI[`INST_RADDRX_E - 1:`INST_RADDRX_S];
+                    endcase
+                1'b1:
+                    reg_raddrx <= QI[`INST_RADDRX_E:`INST_RADDRX_S];
+            endcase
+        end
+    end
 
     //命令モジュール呼び出し //.下位input(上位input) or .下位output(上位output)
     wbuf_send wbuf_send_0(
@@ -202,12 +133,13 @@ module SEQUENCER (input wire CLK,
         .RSTL(RSTL),
         .WBUF_SEND(QI[`INST_WBUF_SEND]),
         .COUNTER0(QI[`INST_COUNTER0_E:`INST_COUNTER0_S]),
+        .WBUF_EN_CTRL_I(QI[`INST_WBUF_EN_CTRL_E:`INST_WBUF_EN_CTRL_S]),
         //output
         .RADDRX(RADDRX),
         .RCEBX(RCEBX),
         .WBUF_EN(WBUF_EN),
         .WBUF_EN_CTRL(WBUF_EN_CTRL),
-        .COUNTER_END(counter_end)
+        .WBUF_BUSY(wbuf_busy)
     );
 
 endmodule

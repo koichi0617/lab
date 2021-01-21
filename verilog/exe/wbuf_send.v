@@ -3,8 +3,6 @@ module wbuf_send(
 	input wire RSTL,
 	input wire WBUF_SEND,
 	input wire [7:0] COUNTER0,
-	input wire [15:0] raddrx,
-	input wire [5:0] wbuf_en_ctrl,
 	output wire [15:0] RADDRX,
 	output wire RCEBX,
 	output wire WBUF_EN,
@@ -26,6 +24,29 @@ module wbuf_send(
 	assign WBUF_EN_CTRL = reg_wbufenctrl;
 	assign COUNTER_END = counter0;
 
+	//RADDRX
+	always @(posedge CLK or negedge RSTL) begin
+		if (!RSTL)			
+			reg_raddrx <= 1'd0;
+		else if(COUNTER0)
+			reg_raddrx <= reg_raddrx + 1'd1;
+		else
+			reg_raddrx <= reg_raddrx;
+    end
+
+	//WBUF_EN_CTRL
+	always@ (posedge CLK or negedge RSTL) begin
+		if (!RSTL)       
+			reg_wbufenctrl <= 1'd0;
+		else if(COUNTER0) begin
+			if(counter0 != 1 && cnt == 3'b100)
+				reg_wbufenctrl <= reg_wbufenctrl + 1'd1;
+			else
+				reg_wbufenctrl <= reg_wbufenctrl;
+		end else
+			reg_wbufenctrl <= reg_wbufenctrl;
+	end
+
 	//counter0
   	always @(posedge CLK or negedge RSTL)  begin
 		if (!RSTL)
@@ -33,19 +54,17 @@ module wbuf_send(
 		else if(WBUF_SEND) begin
 			if(counter0 == 1'd0)
 				counter0 <= COUNTER0;
-			else if(cnt == 3'b100)
-				counter0 <= counter0 - 1;
-			else
-				counter0 <= counter0;
-		end else
-			counter0 <= 1'd0;
+		end else if(cnt == 3'b100)
+			counter0 <= counter0 - 1;
+		else
+			counter0 <= counter0;
 	end
 
 	//cnt:アドレス用カウンタ(4サイクル)
   	always @(posedge CLK or negedge RSTL) begin
 		if (!RSTL)			
 			cnt <= 3'b000;
-		else if(WBUF_SEND) begin
+		else if(COUNTER0) begin
 			if(cnt == 3'b100) begin
 				if(counter0 == 16'd1)
 					cnt <= 3'b000;
@@ -61,7 +80,7 @@ module wbuf_send(
   	always @(posedge CLK or negedge RSTL) begin
 		if (!RSTL)			
 			reg_rcebx <= 1;
-		else if(WBUF_SEND)
+		else if(COUNTER0)
       		reg_rcebx <= 0;
 		else
 			reg_rcebx <= 1;
@@ -71,38 +90,10 @@ module wbuf_send(
   	always @(posedge CLK or negedge RSTL) begin
 		if (!RSTL)			
 			reg_wbufen <= 3'b000;
-		else if(WBUF_SEND)
+		else if(COUNTER0)
       		reg_wbufen <= 1;
 		else
 			reg_wbufen <= 0;
-	end
-
-	//RADDRX
-	always @(posedge CLK or negedge RSTL) begin
-		if (!RSTL)			
-			reg_raddrx <= 1'd0;
-		else if(WBUF_SEND) begin
-			if(counter0 == COUNTER0 && cnt == 3'b001)
-				reg_raddrx <= raddrx;
-			else
-				reg_raddrx <= reg_raddrx + 1'd1;
-		end else
-			reg_raddrx <= 1'd0;
-    end
-
-	//WBUF_EN_CTRL
-	always@ (posedge CLK or negedge RSTL) begin
-		if (!RSTL)       
-			reg_wbufenctrl <= 1'd0;
-		else if(WBUF_SEND) begin
-			if(counter0 == COUNTER0 && cnt == 3'b001)
-				reg_wbufenctrl <= wbuf_en_ctrl;
-			else if(counter0 != 1 && cnt == 3'b100)
-				reg_wbufenctrl <= reg_wbufenctrl + 1'd1;
-			else
-				reg_wbufenctrl <= reg_wbufenctrl;
-		end else
-			reg_wbufenctrl <= 1'd0;
 	end
 
 
