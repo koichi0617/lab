@@ -1,3 +1,24 @@
-`define INST_WBUF_SEND 0
-`define INST_COUNTER0_S 1
-`define INST_COUNTER0_E 8
+`define INST_COUNTER0_S     0
+`define INST_COUNTER0_E     7
+`define INST_COUNTERX_S     8
+`define INST_COUNTERX_E     15
+`define INST_COUNTERX_WE    16
+`define INST_JUMP_COUNTERX  17
+`define INST_COUNTERX_CH    18
+`define INST_WBUF_SEND      19
+`define INST_OUTPUT_SEND    20
+`define INST_CONV_CAL       21
+`define INST_RADDRX_S       22 
+`define INST_RADDRX_E       37
+`define INST_WADDRX_S       38 
+`define INST_WADDRX_E       53
+`define INST_RADDRW_S       54 
+`define INST_RADDRW_E       69
+`define INST_RADDRX_WE      70
+`define INST_WADDRX_WE      71
+`define INST_RADDRW_WE      72
+`define INST_WBUF_EN_CTRL_S 73
+`define INST_WBUF_EN_CTRL_E 78
+`define INST_OUTPUT_EN_CTRL_S 79
+`define INST_OUTPUT_EN_CTRL_E 84
+

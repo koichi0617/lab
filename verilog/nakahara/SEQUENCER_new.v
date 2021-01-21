@@ -82,7 +82,6 @@ module SEQUENCER (input wire CLK,
 
     assign RADDRI = {pc[14:0],1'b0};
     assign RCEBI  = 1'b0;
-    assign counter_en = QI[`INST_COUNTER0_E:`INST_COUNTER0_S];
     assign module_busy = wbuf_busy;
     assign module_en = QI[`INST_WBUF_SEND];
 

@@ -14,7 +14,7 @@ seq:
 seq2:
 	ruby ./scripts/assembler.rb $(MCFILE) > memfile.dat
 	python ./scripts/memBankMaker.py memfile.dat
-	iverilog sequencer_new_test.v SEQUENCER_new.v SEQUENCER_DEF_new.v wbuf_send.v
+	iverilog sequencer_new_test.v SEQUENCER_new.v SEQUENCER_DEF_new.v wbuf_send.v output_send.v conv_cal.v
 	vvp a.out
 	open sequencer_new_test.vcd
 
