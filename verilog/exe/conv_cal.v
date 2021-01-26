@@ -3,6 +3,8 @@ module conv_cal(
 	input wire RSTL,
 	input wire CONV_CAL,
 	input wire [7:0] COUNTER0,
+	input wire [15:0] RADDRW_I,
+	input wire module_busy,
 	output wire [15:0] RADDRW,
 	output wire RCEBW,
 	output wire MAC_EN,
@@ -23,13 +25,14 @@ module conv_cal(
 	assign NL_EN = reg_nlen;
 	assign CONV_BUSY = (counter0 > 1 | |cnt) ? 1:0;
 	assign RCEBW   = ~|counter0;
+	assign start = CONV_CAL & !module_busy;
 
 	//counter0
   	always @(posedge CLK or negedge RSTL)  begin
 		if (!RSTL) begin
 			counter0 <= 0;
 		end
-		else if(CONV_CAL && !CONV_BUSY) begin
+		else if(start) begin
 			counter0 <= COUNTER0;
 		end
 		else if(|counter0 && cnt == 3'b0) begin
@@ -44,7 +47,7 @@ module conv_cal(
   	always @(posedge CLK or negedge RSTL) begin
 		if (!RSTL)	
 			cnt <= 0;
-		else if(CONV_CAL & !CONV_BUSY)
+		else if(start)
 			cnt <= 3'b101;
 		else if(CONV_BUSY && ~|cnt)
 			cnt <= 3'b100;
@@ -58,8 +61,10 @@ module conv_cal(
 	always @(posedge CLK or negedge RSTL) begin
 		if (!RSTL)			
 			reg_raddrw <= 1'd0;
+		else if(start)
+			reg_raddrw <= RADDRW_I;
 		else if(CONV_BUSY) begin
-			if(cnt == 3'b100)
+			if(cnt == 3'b010)
 				reg_raddrw <= reg_raddrw;
 			else
 				reg_raddrw <= reg_raddrw + 1'd1;
