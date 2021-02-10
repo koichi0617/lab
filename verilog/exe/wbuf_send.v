@@ -2,6 +2,7 @@ module wbuf_send(
 	input wire CLK, 
 	input wire RSTL,
 	input wire WBUF_SEND,
+	input wire WBUF_SEND_POOL,
 	input wire [7:0] COUNTER0,
 	input wire [15:0] RADDRX_I,
 	input wire [5:0] WBUF_EN_CTRL_I,
@@ -10,78 +11,67 @@ module wbuf_send(
 	output wire RCEBX,
 	output wire WBUF_EN,
 	output wire [5:0] WBUF_EN_CTRL,
+	output wire I_COMPARE_EN,
+	output wire I_COMPARE_MODE,
+	output wire I_COMPARE_REGEN,
+	output wire I_COMPARE_SWITCH,
 	output wire WBUF_BUSY
 	);
 
-	reg [15:0] 	pc;
-	reg [2:0]   cnt;
-	reg [7:0] 	counter0;
-	reg [15:0] 	reg_raddrx;
-	reg			reg_rcebx;
-	reg 		reg_wbufen;
-	reg [5:0]  	reg_wbufenctrl;
+	wire [15:0] RADDRX_NO;
+	wire		RCEBX_NO;
+	wire		WBUF_EN_NO;
+	wire [5:0]  WBUF_EN_CTRL_NO;
+	wire		WBUF_NO_BUSY;
+	wire [15:0] RADDRX_POOL;
+	wire		RCEBX_POOL;
+	wire		WBUF_EN_POOL;
+	wire [5:0]  WBUF_EN_CTRL_POOL;
+	wire		WBUF_POOL_BUSY;
 
+	assign RADDRX = (COUNTER0_O) ? RADDRX_NO:RADDRX_POOL;
+	assign RCEBX = (COUNTER0_O) ? RCEBX_NO:RCEBX_POOL;
+	assign WBUF_EN = (COUNTER0_O) ? WBUF_EN_NO:WBUF_EN_POOL;
+	assign WBUF_EN_CTRL = (COUNTER0_O) ? WBUF_EN_CTRL_NO:WBUF_EN_CTRL_POOL;
+	assign WBUF_BUSY = WBUF_NO_BUSY | WBUF_POOL_BUSY;
 
-	assign RADDRX = reg_raddrx;
-	assign WBUF_EN_CTRL = reg_wbufenctrl;
-	assign WBUF_BUSY = (counter0 > 1 | |cnt) ? 1:0;
-	assign RCEBX   = ~|counter0;
-	assign WBUF_EN = |counter0;
-	assign start = WBUF_SEND & !module_busy;
+	wbuf_send_nopool wbuf_send_nopool_0(
+        //input
+        .CLK(CLK),
+        .RSTL(RSTL),
+        .WBUF_SEND(WBUF_SEND),
+        .COUNTER0(COUNTER0),
+        .RADDRX_I(RADDRX_I),
+        .WBUF_EN_CTRL_I(WBUF_EN_CTRL_I),
+        .module_busy(module_busy),
+        //output
+        .RADDRX(RADDRX_NO),
+        .RCEBX(RCEBX_NO),
+        .WBUF_EN(WBUF_EN_NO),
+        .WBUF_EN_CTRL(WBUF_EN_CTRL_NO),
+        .WBUF_BUSY(WBUF_NO_BUSY),
+		.COUNTER0_O(COUNTER0_O)
+    );
 
-	//counter0
-  	always @(posedge CLK or negedge RSTL)  begin
-		if (!RSTL) begin
-			counter0 <= 0;
-		end
-		else if(start) begin
-			counter0 <= COUNTER0;
-		end
-		else if(|counter0 && cnt == 3'b0) begin
-			counter0 <= counter0 - 1;
-		end
-		else begin
-			counter0 <= counter0;
-		end
-	end
-
-	//cnt:アドレス用カウンタ
-  	always @(posedge CLK or negedge RSTL) begin
-		if (!RSTL)	
-			cnt <= 0;
-		else if(start)
-			cnt <= 3'b100;
-		else if(WBUF_BUSY && ~|cnt)
-			cnt <= 3'b011;
-		else if(WBUF_BUSY) begin
-			cnt <= cnt - 1;
-		end else
-			cnt <= 0;
-	end
-
-	//RADDRX
-	always @(posedge CLK or negedge RSTL) begin
-		if (!RSTL)			
-			reg_raddrx <= 1'd0;
-		else if(start)
-			reg_raddrx <= RADDRX_I;
-		else if(WBUF_BUSY)
-			reg_raddrx <= reg_raddrx + 1'd1;
-		else
-			reg_raddrx <= reg_raddrx;
-    end
-
-	//WBUF_EN_CTRL
-	always@ (posedge CLK or negedge RSTL) begin
-		if (!RSTL)       
-			reg_wbufenctrl <= 1'd0;
-		else if(start)
-			reg_wbufenctrl <= WBUF_EN_CTRL_I;
-		else if(WBUF_BUSY & ~|cnt)
-			reg_wbufenctrl <= reg_wbufenctrl + 1'd1;
-		else
-			reg_wbufenctrl <= reg_wbufenctrl;
-	end
-
+	wbuf_send_pool wbuf_send_pool_0(
+        //input
+        .CLK(CLK),
+        .RSTL(RSTL),
+        .WBUF_SEND_POOL(WBUF_SEND_POOL),
+        .COUNTER0(COUNTER0),
+        .RADDRX_I(RADDRX_I),
+        .WBUF_EN_CTRL_I(WBUF_EN_CTRL_I),
+        .module_busy(module_busy),
+        //output
+        .RADDRX(RADDRX_POOL),
+        .RCEBX(RCEBX_POOL),
+        .WBUF_EN(WBUF_EN_POOL),
+        .WBUF_EN_CTRL(WBUF_EN_CTRL_POOL),
+        .I_COMPARE_EN(I_COMPARE_EN),
+        .I_COMPARE_MODE(I_COMPARE_MODE),
+        .I_COMPARE_REGEN(I_COMPARE_REGEN),
+        .I_COMPARE_SWITCH(I_COMPARE_SWITCH),
+        .WBUF_POOL_BUSY(WBUF_POOL_BUSY)
+    );
 
 endmodule

@@ -9,7 +9,8 @@ module conv_cal(
 	output wire RCEBW,
 	output wire MAC_EN,
 	output wire NL_EN,
-	output wire CONV_BUSY
+	output wire CONV_BUSY,
+	output wire COUNTER0_O
 	);
 
 	reg [15:0] 	pc;
@@ -26,6 +27,7 @@ module conv_cal(
 	assign CONV_BUSY = (counter0 > 1 | |cnt) ? 1:0;
 	assign RCEBW   = ~|counter0;
 	assign start = CONV_CAL & !module_busy;
+	assign COUNTER0_O = |counter0;
 
 	//counter0
   	always @(posedge CLK or negedge RSTL)  begin
@@ -97,6 +99,5 @@ module conv_cal(
 		end else
 			reg_nlen <= 1'b0;
 	end
-
 
 endmodule

@@ -3,11 +3,8 @@
 module SEQUENCER (input wire CLK,
                   input wire RSTL,
                   input wire PURGE,
-                  input wire MBUSYW,
-                  input wire MBUSYXI,
-                  input wire MBUSYXO,
-                  input wire [255:0] QI,
-                  output wire [15:0] RADDRI,
+                  input wire [127:0] QI,
+                  output wire [13:0] RADDRI,
                   output wire RCEBI,
                   output wire [15:0] RADDRX,
                   output wire [15:0] RADDRW,
@@ -44,12 +41,6 @@ module SEQUENCER (input wire CLK,
                   output wire FEEDBACK_MODE,
                   output wire CONF_EN,
                   output wire I_COMPARE_REGEN,
-                  output wire [1:0] NL_LOOP_SEL,
-                  output wire SEQ_LOAD_I,
-                  output wire SEQ_FIN,
-                  output wire SEQ_STARTW,
-                  output wire SEQ_STARTX,
-                  output wire SEQ_STARTX_OUT,
                   output wire RCEBX0);
     
     reg [15:0] pc; //SRAM（マイクロコード）の何行目からもってくるか
@@ -74,14 +65,23 @@ module SEQUENCER (input wire CLK,
     reg [255:0] qi_latch;
     reg [2:0] cnt;
     reg [7:0] counter;
+    reg [15:0] delay_pc;
     wire module_busy;
     wire wbuf_busy;
     wire module_en;
+    wire [15:0] raddrw;
+    wire pc_change;
+    wire [15:0] raddrx;
+    wire [15:0] waddrx;
 
-    assign RADDRI = {pc[14:0],1'b0};
+    assign raddrx = reg_raddrx;
+    assign waddrx = reg_waddrx;
+    assign raddrw = reg_raddrw;
+    assign RADDRI = pc[14:0];
     assign RCEBI  = 1'b0;
-    assign module_busy = wbuf_busy | output_busy | conv_busy;
-    assign module_en = QI[`INST_WBUF_SEND] | QI[`INST_OUTPUT_SEND] | QI[`INST_CONV_CAL];
+    assign module_busy = wbuf_busy | output_busy | cal_busy;
+    assign module_en = QI[`INST_WBUF_SEND] | QI[`INST_OUTPUT_SEND] | QI[`INST_CONV_CAL] | QI[`INST_WBUF_SEND_POOL] | QI[`INST_OUTPUT_SEND_POOL] | QI[`INST_FC_CAL];
+    assign pc_change = (delay_pc != pc) ? 1:0;
 
     //PC
     always@ (posedge CLK or negedge RSTL)
@@ -117,9 +117,6 @@ module SEQUENCER (input wire CLK,
         else pc <= pc + 1'b1;
     end
     
-    reg [15:0] delay_pc;
-    wire pc_change;
-    assign pc_change = (delay_pc != pc) ? 1:0;
     always@ (posedge CLK or negedge RSTL)
     begin
         if (!RSTL)      delay_pc <= 16'b0;
@@ -225,18 +222,7 @@ module SEQUENCER (input wire CLK,
         end
     end
 
-    //pc_adjust
-    reg pc_adjust;
-    always@ (posedge CLK or negedge RSTL)
-    begin
-        if (!RSTL)      pc_adjust <= 0;
-        else if (PURGE) pc_adjust <= 0;
-        else            pc_adjust <= module_busy;
-    end
-
     //RADDRX
-    wire [15:0] raddrx;
-    assign raddrx = reg_raddrx;
     always@ (posedge CLK or negedge RSTL)
     begin
         if (!RSTL)       reg_raddrx <= 16'b0;
@@ -258,8 +244,6 @@ module SEQUENCER (input wire CLK,
     end
 
     //WADDRX
-    wire [15:0] waddrx;
-    assign waddrx = reg_waddrx;
     always@ (posedge CLK or negedge RSTL)
     begin
         if (!RSTL)       reg_waddrx <= 16'b0;
@@ -281,8 +265,6 @@ module SEQUENCER (input wire CLK,
     end
 
     //RADDRW
-    wire [15:0] raddrw;
-    assign raddrw = reg_raddrw;
     always@ (posedge CLK or negedge RSTL)
     begin
         if (!RSTL)       reg_raddrw <= 16'b0;
@@ -303,12 +285,23 @@ module SEQUENCER (input wire CLK,
         else    reg_raddrw <= reg_raddrw;
     end
 
+    //qi_latch
+    always@ (posedge CLK or negedge RSTL)
+    begin
+        if (!RSTL)       qi_latch <= 256'b0;
+        else begin
+            if(!PURGE)
+                qi_latch <= QI;
+        end
+    end
+
     //命令モジュール呼び出し //.下位input(上位input) or .下位output(上位output)
     wbuf_send wbuf_send_0(
         //input
         .CLK(CLK),
         .RSTL(RSTL),
         .WBUF_SEND(QI[`INST_WBUF_SEND]),
+        .WBUF_SEND_POOL(QI[`INST_WBUF_SEND_POOL]),
         .COUNTER0(QI[`INST_COUNTER0_E:`INST_COUNTER0_S]),
         .RADDRX_I(raddrx),
         .WBUF_EN_CTRL_I(QI[`INST_WBUF_EN_CTRL_E:`INST_WBUF_EN_CTRL_S]),
@@ -318,6 +311,10 @@ module SEQUENCER (input wire CLK,
         .RCEBX(RCEBX),
         .WBUF_EN(WBUF_EN),
         .WBUF_EN_CTRL(WBUF_EN_CTRL),
+        .I_COMPARE_EN(I_COMPARE_EN),
+        .I_COMPARE_MODE(I_COMPARE_MODE),
+        .I_COMPARE_REGEN(I_COMPARE_REGEN),
+        .I_COMPARE_SWITCH(I_COMPARE_SWITCH),
         .WBUF_BUSY(wbuf_busy)
     );
 
@@ -326,6 +323,7 @@ module SEQUENCER (input wire CLK,
         .CLK(CLK),
         .RSTL(RSTL),
         .OUTPUT_SEND(QI[`INST_OUTPUT_SEND]),
+        .OUTPUT_SEND_POOL(QI[`INST_OUTPUT_SEND_POOL]),
         .COUNTER0(QI[`INST_COUNTER0_E:`INST_COUNTER0_S]),
         .WADDRX_I(waddrx),
         .OUTPUT_EN_CTRL_I(QI[`INST_OUTPUT_EN_CTRL_E:`INST_OUTPUT_EN_CTRL_S]),
@@ -335,14 +333,18 @@ module SEQUENCER (input wire CLK,
         .WCEBX(WCEBX),
         .OUTPUT_EN(OUTPUT_EN),
         .OUTPUT_EN_CTRL(OUTPUT_EN_CTRL),
+        .O_COMPARE_EN(O_COMPARE_EN),
+        .O_COMPARE_MODE(O_COMPARE_MODE),
+        .O_COMPARE_SWITCH(O_COMPARE_SWITCH),
         .OUTPUT_BUSY(output_busy)
     );
 
-    conv_cal conv_cal_0(
+    cal cal_0(
         //input
         .CLK(CLK),
         .RSTL(RSTL),
         .CONV_CAL(QI[`INST_CONV_CAL]),
+        .FC_CAL(QI[`INST_FC_CAL]),
         .COUNTER0(QI[`INST_COUNTER0_E:`INST_COUNTER0_S]),
         .RADDRW_I(raddrw),
         .module_busy(module_busy),
@@ -351,8 +353,26 @@ module SEQUENCER (input wire CLK,
         .RCEBW(RCEBW),
         .MAC_EN(MAC_EN),
         .NL_EN(NL_EN),
-        .CONV_BUSY(conv_busy)
+        .CAL_MODE(CAL_MODE),
+        .WEIGHT_EN(FC_WEIGHT_EN),
+        .CAL_BUSY(cal_busy)
     );
 
+    assign BANKX            = qi_latch[`INST_BANKX];
+    assign REQX             = qi_latch[`INST_REQX];
+    assign BANKW            = qi_latch[`INST_BANKW];
+    assign REQW             = qi_latch[`INST_REQW];
+    assign WBUF_PURGE       = qi_latch[`INST_WBUF_PURGE];
+    assign WBUF_ALL_EN      = qi_latch[`INST_WBUF_ALL_EN];
+    assign WBUF_SWITCH      = qi_latch[`INST_WBUF_SWITCH];
+    assign SHIFT_MODE       = qi_latch[`INST_SHIFT_MODE];
+    assign NL_SEL           = qi_latch[`INST_NL_SEL_E:`INST_NL_SEL_S];
+    assign RESULT_REQ       = qi_latch[`INST_RESULT_REQ];
+    assign OLSB             = qi_latch[`INST_OLSB_E:`INST_OLSB_S];
+    assign RESULT_PURGE     = qi_latch[`INST_RESULT_PURGE];
+    assign CONV_FC_MODE     = qi_latch[`INST_CONV_FC_MODE];
+    assign FEEDBACK_MODE    = qi_latch[`INST_FEEDBACK_MODE];
+    assign CONF_EN          = qi_latch[`INST_CONF_EN];
+    assign RCEBX0           = qi_latch[`INST_RCEBX0];
 
 endmodule

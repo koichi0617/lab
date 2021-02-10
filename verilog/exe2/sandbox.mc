@@ -24,6 +24,22 @@ INST_RADDRW             0000000000000000
 INST_WBUF_SEND_POOL     0
 INST_OUTPUT_SEND_POOL   0
 INST_FC_CAL             0
+INST_BANKX              0
+INST_BANKW              0
+INST_REQX               0
+INST_REQW               0
+INST_WBUF_PURGE         0
+INST_WBUF_ALL_EN        0
+INST_WBUF_SWITCH        0
+INST_SHIFT_MODE         0
+INST_RESULT_REQ         0
+INST_OLSB               0000
+INST_RESULT_PURGE       0
+INST_CONV_FC_MODE       0
+INST_FEEDBACK_MODE      0
+INST_CONF_EN            0
+INST_RCEBX0             0
+
 
 #1
 INST_WBUF_SEND          1

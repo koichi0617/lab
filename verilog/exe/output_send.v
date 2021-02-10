@@ -2,6 +2,7 @@ module output_send(
 	input wire CLK, 
 	input wire RSTL,
 	input wire OUTPUT_SEND,
+	input wire OUTPUT_SEND_POOL,
 	input wire [7:0] COUNTER0,
 	input wire [15:0] WADDRX_I,
 	input wire [5:0] OUTPUT_EN_CTRL_I,
@@ -10,78 +11,66 @@ module output_send(
 	output wire WCEBX,
 	output wire OUTPUT_EN,
 	output wire [5:0] OUTPUT_EN_CTRL,
+	output wire O_COMPARE_EN,
+	output wire O_COMPARE_MODE,
+	output wire O_COMPARE_REGEN,
+	output wire O_COMPARE_SWITCH,
 	output wire OUTPUT_BUSY
 	);
 
-	reg [15:0] 	pc;
-	reg [2:0]   cnt;
-	reg [7:0] 	counter0;
-	reg [15:0] 	reg_waddrx;
-	reg			reg_wcebx;
-	reg 		reg_outputen;
-	reg [5:0]  	reg_outputenctrl;
+	wire [15:0] WADDRX_NO;
+	wire		WCEBX_NO;
+	wire		OUTPUT_EN_NO;
+	wire [5:0]  OUTPUT_EN_CTRL_NO;
+	wire		OUTPUT_NO_BUSY;
+	wire [15:0] WADDRX_POOL;
+	wire		WCEBX_POOL;
+	wire		OUTPUT_EN_POOL;
+	wire [5:0]  OUTPUT_EN_CTRL_POOL;
+	wire		OUTPUT_POOL_BUSY;
 
+	assign WADDRX = (COUNTER0_O) ? WADDRX_NO:WADDRX_POOL;
+	assign WCEBX = (COUNTER0_O) ? WCEBX_NO:WCEBX_POOL;
+	assign OUTPUT_EN = (COUNTER0_O) ? OUTPUT_EN_NO:OUTPUT_EN_POOL;
+	assign OUTPUT_EN_CTRL = (COUNTER0_O) ? OUTPUT_EN_CTRL_NO:OUTPUT_EN_CTRL_POOL;
+	assign OUTPUT_BUSY = OUTPUT_NO_BUSY | OUTPUT_POOL_BUSY;
 
-	assign WADDRX = reg_waddrx;
-	assign OUTPUT_EN_CTRL = reg_outputenctrl;
-	assign OUTPUT_BUSY = (counter0 > 1 | |cnt) ? 1:0;
-	assign WCEBX   = ~|counter0;
-	assign OUTPUT_EN = |counter0;
-	assign start = OUTPUT_SEND & !module_busy;
+	output_send_nopool output_send_nopool_0(
+        //input
+        .CLK(CLK),
+        .RSTL(RSTL),
+        .OUTPUT_SEND(OUTPUT_SEND),
+        .COUNTER0(COUNTER0),
+        .WADDRX_I(WADDRX_I),
+        .OUTPUT_EN_CTRL_I(OUTPUT_EN_CTRL_I),
+        .module_busy(module_busy),
+        //output
+        .WADDRX(WADDRX_NO),
+        .WCEBX(WCEBX_NO),
+        .OUTPUT_EN(OUTPUT_EN_NO),
+        .OUTPUT_EN_CTRL(OUTPUT_EN_CTRL_NO),
+        .OUTPUT_BUSY(OUTPUT_NO_BUSY),
+		.COUNTER0_O(COUNTER0_O)
+    );
 
-	//counter0
-  	always @(posedge CLK or negedge RSTL)  begin
-		if (!RSTL) begin
-			counter0 <= 0;
-		end
-		else if(start) begin
-			counter0 <= COUNTER0;
-		end
-		else if(|counter0 && cnt == 3'b0) begin
-			counter0 <= counter0 - 1;
-		end
-		else begin
-			counter0 <= counter0;
-		end
-	end
-
-	//cnt:アドレス用カウンタ
-  	always @(posedge CLK or negedge RSTL) begin
-		if (!RSTL)	
-			cnt <= 0;
-		else if(start)
-			cnt <= 3'b100;
-		else if(OUTPUT_BUSY && ~|cnt)
-			cnt <= 3'b011;
-		else if(OUTPUT_BUSY) begin
-			cnt <= cnt - 1;
-		end else
-			cnt <= 0;
-	end
-
-	//WADDRX
-	always @(posedge CLK or negedge RSTL) begin
-		if (!RSTL)			
-			reg_waddrx <= 1'd0;
-		else if(start)
-			reg_waddrx <= WADDRX_I;
-		else if(OUTPUT_BUSY)
-			reg_waddrx <= reg_waddrx + 1'd1;
-		else
-			reg_waddrx <= reg_waddrx;
-    end
-
-	//OUTPUT_EN_CTRL
-	always@ (posedge CLK or negedge RSTL) begin
-		if (!RSTL)       
-			reg_outputenctrl <= 1'd0;
-		else if(start)
-			reg_outputenctrl <= OUTPUT_EN_CTRL_I;
-		else if(OUTPUT_BUSY & ~|cnt)
-			reg_outputenctrl <= reg_outputenctrl + 1'd1;
-		else
-			reg_outputenctrl <= reg_outputenctrl;
-	end
-
+	output_send_pool output_send_pool_0(
+        //input
+        .CLK(CLK),
+        .RSTL(RSTL),
+        .OUTPUT_SEND_POOL(OUTPUT_SEND_POOL),
+        .COUNTER0(COUNTER0),
+        .WADDRX_I(WADDRX_I),
+        .OUTPUT_EN_CTRL_I(OUTPUT_EN_CTRL_I),
+        .module_busy(module_busy),
+        //output
+        .WADDRX(WADDRX_POOL),
+        .WCEBX(WCEBX_POOL),
+        .OUTPUT_EN(OUTPUT_EN_POOL),
+        .OUTPUT_EN_CTRL(OUTPUT_EN_CTRL_POOL),
+        .O_COMPARE_EN(O_COMPARE_EN),
+        .O_COMPARE_MODE(O_COMPARE_MODE),
+        .O_COMPARE_SWITCH(O_COMPARE_SWITCH),
+        .OUTPUT_POOL_BUSY(OUTPUT_POOL_BUSY)
+    );
 
 endmodule

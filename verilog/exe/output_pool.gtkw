@@ -1,0 +1,42 @@
+[*]
+[*] GTKWave Analyzer v3.3.107 (w)1999-2020 BSI
+[*] Wed Feb  3 06:09:24 2021
+[*]
+[dumpfile] "/Users/koichi/dev/lab/verilog/exe/sequencer_new_test.vcd"
+[dumpfile_mtime] "Wed Feb  3 06:07:08 2021"
+[dumpfile_size] 1505548
+[savefile] "/Users/koichi/dev/lab/verilog/exe/output_pool.gtkw"
+[timestart] 185390
+[size] 1000 600
+[pos] -1 -1
+*-14.000000 35700 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] sequencer_test.
+[treeopen] sequencer_test.SEQUENCER_0.
+[treeopen] sequencer_test.SEQUENCER_0.output_send_0.
+[sst_width] 193
+[signals_width] 193
+[sst_expanded] 1
+[sst_vpaned_height] 167
+@28
+sequencer_test.SEQUENCER_0.output_send_0.output_send_pool_0.CLK
+@22
+sequencer_test.SEQUENCER_0.pc[15:0]
+@28
+sequencer_test.SEQUENCER_0.O_COMPARE_MODE
+sequencer_test.SEQUENCER_0.O_COMPARE_EN
+sequencer_test.SEQUENCER_0.O_COMPARE_SWITCH
+sequencer_test.SEQUENCER_0.WCEBX
+sequencer_test.SEQUENCER_0.OUTPUT_EN
+@24
+sequencer_test.SEQUENCER_0.OUTPUT_EN_CTRL[5:0]
+@25
+sequencer_test.SEQUENCER_0.WADDRX[15:0]
+@28
+sequencer_test.SEQUENCER_0.output_send_0.output_send_pool_0.cnt[4:0]
+@22
+sequencer_test.SEQUENCER_0.output_send_0.output_send_pool_0.counter0[7:0]
+@28
+sequencer_test.SEQUENCER_0.output_send_0.output_send_pool_0.start
+sequencer_test.SEQUENCER_0.output_send_0.output_send_pool_0.module_busy
+[pattern_trace] 1
+[pattern_trace] 0
