@@ -116,6 +116,8 @@ module wbuf_send_pool(
 	always@ (posedge CLK or negedge RSTL) begin
 		if (!RSTL)       
 			reg_wbufenctrl <= 1'd0;
+		else if(cnt == 4'b1001)
+			reg_wbufenctrl <= WBUF_EN_CTRL_I;
 		else if(counter0 == 1)
 			reg_wbufenctrl <= reg_wbufenctrl;
 		else if(cnt == 4'b0101 & reg_wbufen)

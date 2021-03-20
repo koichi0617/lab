@@ -106,7 +106,9 @@ module output_send_pool(
 		if (!RSTL)       
 			reg_outputenctrl <= 1'd0;
 		else if(OUTPUT_POOL_BUSY) begin
-			if(counter0 == 1)
+			if(cnt == 5'b10010)
+				reg_outputenctrl <= OUTPUT_EN_CTRL_I;
+			else if(counter0 == 1)
 				reg_outputenctrl <= reg_outputenctrl;
 			else if(cnt == 5'b01110 | cnt == 5'b01010 | cnt == 5'b00101 | cnt == 5'b00001)
 				reg_outputenctrl <= reg_outputenctrl + 1;

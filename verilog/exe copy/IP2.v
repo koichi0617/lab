@@ -49,7 +49,7 @@ module IP2(input wire CLK,
     SEQUENCER sequencer_0(
         .CLK(CLK),
         .RSTL(RSTL),
-        .PURGE(SEQ_PURGE),
+        .PURGE(PURGE),
         //MEM Control for I
         .QI(QI),
         .RADDRI(RADDRI),

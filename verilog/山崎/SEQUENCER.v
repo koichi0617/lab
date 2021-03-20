@@ -1,4 +1,4 @@
-`include "SEQUENCER_DEF_new.v"
+`include "SEQUENCER_DEF.v"
 
 module SEQUENCER (input wire CLK,
                   input wire RSTL,
@@ -13,6 +13,7 @@ module SEQUENCER (input wire CLK,
                   output wire BANKW,
                   output wire RCEBW,
                   output wire RCEBX,
+                  output wire REQX,
                   output wire WCEBX,
                   output wire REQW,
                   output wire WBUF_PURGE,
@@ -68,6 +69,8 @@ module SEQUENCER (input wire CLK,
     reg [15:0] delay_pc;
     wire module_busy;
     wire wbuf_busy;
+    wire output_busy;
+    wire cal_busy;
     wire module_en;
     wire [15:0] raddrw;
     wire pc_change;
@@ -117,6 +120,7 @@ module SEQUENCER (input wire CLK,
         else pc <= pc + 1'b1;
     end
     
+    //delay_pc
     always@ (posedge CLK or negedge RSTL)
     begin
         if (!RSTL)      delay_pc <= 16'b0;

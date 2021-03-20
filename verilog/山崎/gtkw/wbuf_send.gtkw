@@ -1,0 +1,38 @@
+[*]
+[*] GTKWave Analyzer v3.3.107 (w)1999-2020 BSI
+[*] Wed Jan 27 07:50:48 2021
+[*]
+[dumpfile] "/Users/koichi/dev/lab/verilog/exe/sequencer_new_test.vcd"
+[dumpfile_mtime] "Wed Jan 27 07:47:17 2021"
+[dumpfile_size] 1506350
+[savefile] "/Users/koichi/dev/lab/verilog/exe/wbuf_send.gtkw"
+[timestart] 83400
+[size] 1000 600
+[pos] -1 -1
+*-14.000000 18510 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] sequencer_test.
+[treeopen] sequencer_test.SEQUENCER_0.
+[treeopen] sequencer_test.SEQUENCER_0.wbuf_send_0.
+[sst_width] 193
+[signals_width] 176
+[sst_expanded] 1
+[sst_vpaned_height] 167
+@22
+sequencer_test.SEQUENCER_0.QI[255:0]
+@28
+sequencer_test.SEQUENCER_0.CLK
+sequencer_test.SEQUENCER_0.WBUF_EN
+sequencer_test.SEQUENCER_0.RCEBX
+sequencer_test.SEQUENCER_0.RSTL
+@22
+sequencer_test.SEQUENCER_0.WBUF_EN_CTRL[5:0]
+@24
+sequencer_test.SEQUENCER_0.RADDRX[15:0]
+@28
+sequencer_test.SEQUENCER_0.wbuf_send_0.wbuf_send_nopool_0.cnt[2:0]
+@22
+sequencer_test.SEQUENCER_0.wbuf_send_0.wbuf_send_nopool_0.counter0[7:0]
+@23
+sequencer_test.SEQUENCER_0.pc[15:0]
+[pattern_trace] 1
+[pattern_trace] 0

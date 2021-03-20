@@ -1,0 +1,105 @@
+[*]
+[*] GTKWave Analyzer v3.3.107 (w)1999-2020 BSI
+[*] Wed Mar 10 06:40:15 2021
+[*]
+[dumpfile] "/Users/koichi/dev/lab/verilog/exe/wave.vcd"
+[dumpfile_mtime] "Wed Mar 10 06:23:23 2021"
+[dumpfile_size] 3119733
+[savefile] "/Users/koichi/dev/lab/verilog/exe/gtkw/SEQUENCER.gtkw"
+[timestart] 0
+[size] 1280 755
+[pos] -1 -1
+*-5.000000 40 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] IP2_TEST.
+[treeopen] IP2_TEST.ip2_0.
+[treeopen] IP2_TEST.ip2_0.sequencer_0.
+[treeopen] IP2_TEST.ip2_0.sequencer_0.wbuf_send_0.
+[sst_width] 193
+[signals_width] 193
+[sst_expanded] 1
+[sst_vpaned_height] 294
+@28
+IP2_TEST.ip2_0.sequencer_0.BANKW
+IP2_TEST.ip2_0.sequencer_0.BANKX
+IP2_TEST.ip2_0.sequencer_0.CAL_MODE
+IP2_TEST.ip2_0.sequencer_0.CLK
+IP2_TEST.ip2_0.sequencer_0.CONF_EN
+IP2_TEST.ip2_0.sequencer_0.CONV_FC_MODE
+IP2_TEST.ip2_0.sequencer_0.FC_WEIGHT_EN
+IP2_TEST.ip2_0.sequencer_0.FEEDBACK_MODE
+IP2_TEST.ip2_0.sequencer_0.I_COMPARE_EN
+IP2_TEST.ip2_0.sequencer_0.I_COMPARE_MODE
+IP2_TEST.ip2_0.sequencer_0.I_COMPARE_REGEN
+IP2_TEST.ip2_0.sequencer_0.I_COMPARE_SWITCH
+IP2_TEST.ip2_0.sequencer_0.MAC_EN
+IP2_TEST.ip2_0.sequencer_0.NL_EN
+IP2_TEST.ip2_0.sequencer_0.NL_SEL[1:0]
+@22
+IP2_TEST.ip2_0.sequencer_0.OLSB[3:0]
+@28
+IP2_TEST.ip2_0.sequencer_0.OUTPUT_EN
+@22
+IP2_TEST.ip2_0.sequencer_0.OUTPUT_EN_CTRL[5:0]
+@28
+IP2_TEST.ip2_0.sequencer_0.O_COMPARE_EN
+IP2_TEST.ip2_0.sequencer_0.O_COMPARE_MODE
+IP2_TEST.ip2_0.sequencer_0.O_COMPARE_SWITCH
+IP2_TEST.ip2_0.sequencer_0.PURGE
+@22
+IP2_TEST.ip2_0.sequencer_0.QI[127:0]
+IP2_TEST.ip2_0.sequencer_0.RADDRI[13:0]
+IP2_TEST.ip2_0.sequencer_0.RADDRW[15:0]
+IP2_TEST.ip2_0.sequencer_0.RADDRX[15:0]
+IP2_TEST.ip2_0.sequencer_0.wbuf_send_0.COUNTER0[7:0]
+IP2_TEST.ip2_0.sequencer_0.wbuf_send_0.wbuf_send_nopool_0.counter0[7:0]
+@29
+IP2_TEST.ip2_0.sequencer_0.WBUF_EN
+@28
+IP2_TEST.ip2_0.sequencer_0.wbuf_send_0.wbuf_send_nopool_0.cnt[2:0]
+IP2_TEST.ip2_0.sequencer_0.RCEBI
+IP2_TEST.ip2_0.sequencer_0.RCEBW
+IP2_TEST.ip2_0.sequencer_0.RCEBX
+IP2_TEST.ip2_0.sequencer_0.RCEBX0
+IP2_TEST.ip2_0.sequencer_0.REQW
+IP2_TEST.ip2_0.sequencer_0.REQX
+IP2_TEST.ip2_0.sequencer_0.RESULT_PURGE
+IP2_TEST.ip2_0.sequencer_0.RESULT_REQ
+IP2_TEST.ip2_0.sequencer_0.RSTL
+IP2_TEST.ip2_0.sequencer_0.SHIFT_MODE
+@22
+IP2_TEST.ip2_0.sequencer_0.WADDRX[15:0]
+@28
+IP2_TEST.ip2_0.sequencer_0.WBUF_ALL_EN
+@22
+IP2_TEST.ip2_0.sequencer_0.WBUF_EN_CTRL[5:0]
+@28
+IP2_TEST.ip2_0.sequencer_0.WBUF_PURGE
+IP2_TEST.ip2_0.sequencer_0.WBUF_SWITCH
+IP2_TEST.ip2_0.sequencer_0.WCEBX
+IP2_TEST.ip2_0.sequencer_0.cal_busy
+@22
+IP2_TEST.ip2_0.sequencer_0.counter1[7:0]
+IP2_TEST.ip2_0.sequencer_0.counter2[7:0]
+IP2_TEST.ip2_0.sequencer_0.counter3[7:0]
+IP2_TEST.ip2_0.sequencer_0.counter4[7:0]
+IP2_TEST.ip2_0.sequencer_0.delay_pc[15:0]
+@28
+IP2_TEST.ip2_0.sequencer_0.module_busy
+IP2_TEST.ip2_0.sequencer_0.module_en
+IP2_TEST.ip2_0.sequencer_0.output_busy
+@22
+IP2_TEST.ip2_0.sequencer_0.pc[15:0]
+@28
+IP2_TEST.ip2_0.sequencer_0.pc_change
+@22
+IP2_TEST.ip2_0.sequencer_0.qi_latch[255:0]
+IP2_TEST.ip2_0.sequencer_0.raddrw[15:0]
+IP2_TEST.ip2_0.sequencer_0.raddrx[15:0]
+IP2_TEST.ip2_0.sequencer_0.reg_raddrw[15:0]
+IP2_TEST.ip2_0.sequencer_0.reg_raddrx[15:0]
+IP2_TEST.ip2_0.sequencer_0.reg_waddrx[15:0]
+IP2_TEST.ip2_0.sequencer_0.waddrx[15:0]
+@28
+IP2_TEST.ip2_0.sequencer_0.wbuf_busy
+[pattern_trace] 1
+[pattern_trace] 0

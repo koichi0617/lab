@@ -1,0 +1,37 @@
+[*]
+[*] GTKWave Analyzer v3.3.107 (w)1999-2020 BSI
+[*] Fri Feb  5 07:19:52 2021
+[*]
+[dumpfile] "/Users/koichi/dev/lab/verilog/exe/sequencer_new_test.vcd"
+[dumpfile_mtime] "Fri Feb  5 07:16:24 2021"
+[dumpfile_size] 1507353
+[savefile] "/Users/koichi/dev/lab/verilog/exe/conv_cal.gtkw"
+[timestart] 0
+[size] 1000 600
+[pos] -1 -1
+*-14.000000 28320 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] sequencer_test.
+[treeopen] sequencer_test.SEQUENCER_0.
+[treeopen] sequencer_test.SEQUENCER_0.cal_0.
+[sst_width] 193
+[signals_width] 167
+[sst_expanded] 1
+[sst_vpaned_height] 167
+@28
+sequencer_test.SEQUENCER_0.CLK
+sequencer_test.SEQUENCER_0.MAC_EN
+@29
+sequencer_test.SEQUENCER_0.cal_0.CAL_MODE
+@28
+sequencer_test.SEQUENCER_0.NL_EN
+sequencer_test.SEQUENCER_0.RCEBW
+@24
+sequencer_test.SEQUENCER_0.RADDRW[15:0]
+@22
+sequencer_test.SEQUENCER_0.cal_0.fc_cal_0.reg_raddrw[15:0]
+sequencer_test.SEQUENCER_0.cal_0.fc_cal_0.RADDRW[15:0]
+sequencer_test.SEQUENCER_0.RADDRW[15:0]
+@28
+sequencer_test.SEQUENCER_0.cal_0.CAL_BUSY
+[pattern_trace] 1
+[pattern_trace] 0

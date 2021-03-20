@@ -28,6 +28,7 @@ module output_send(
 	wire		OUTPUT_EN_POOL;
 	wire [5:0]  OUTPUT_EN_CTRL_POOL;
 	wire		OUTPUT_POOL_BUSY;
+	wire		COUNTER0_O;
 
 	assign WADDRX = (COUNTER0_O) ? WADDRX_NO:WADDRX_POOL;
 	assign WCEBX = (COUNTER0_O) ? WCEBX_NO:WCEBX_POOL;

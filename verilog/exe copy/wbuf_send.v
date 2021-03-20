@@ -28,6 +28,7 @@ module wbuf_send(
 	wire		WBUF_EN_POOL;
 	wire [5:0]  WBUF_EN_CTRL_POOL;
 	wire		WBUF_POOL_BUSY;
+	wire		COUNTER0_O;
 
 	assign RADDRX = (COUNTER0_O) ? RADDRX_NO:RADDRX_POOL;
 	assign RCEBX = (COUNTER0_O) ? RCEBX_NO:RCEBX_POOL;

@@ -25,6 +25,7 @@ module cal(
 	wire		MAC_EN_FC;
 	wire        NL_EN_FC;
 	wire		FC_BUSY;
+	wire		COUNTER0_O;
 
 	assign RADDRW = (COUNTER0_O) ? RADDRW_CONV:RADDRW_FC;
 	assign RCEBW = (COUNTER0_O) ? RCEBW_CONV:RCEBW_FC;
